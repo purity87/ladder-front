@@ -1,24 +1,45 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/Home.scss';
 
 export default function Home() {
     const [nickname, setNickname] = useState('');
     const [lanes, setLanes] = useState(4);
     const navigate = useNavigate();
 
+    const [roomInfo, setRoomInfo] = useState({
+        winRailNo: null,
+        nickName: '',
+        roomId: '',
+    });
+
+
+
     const handleCreateRoom = async () => {
         if (!nickname || lanes < 2 || lanes > 10) return;
-        const playerId = Math.random().toString(36).substr(2, 9);
-        const res = await fetch('http://localhost:3000/api/rooms', {
+        const res = await fetch('http://localhost:9090/create/room', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ playerId, nickname, lanes }),
+            body: JSON.stringify({ nickname, lanes }),
+        })
+        const { roomId, winRailNo } = await res.json();
+        // 상태 업데이트
+        setRoomInfo({
+            roomId,     // roomId: roomId 형태로 작성
+            nickname,   // nickname: nickname 형태로 작성
+            winRailNo,  // winRailNo: winRailNo 형태로 작성
         });
-        const { roomId } = await res.json();
-        if (roomId) {
-            navigate(`/game/${roomId}?playerId=${playerId}&nickname=${nickname}`);
+
+    }
+
+    // 상태 변경 후에 navigate를 수행할 useEffect
+    useEffect(() => {
+        if (roomInfo.roomId) {
+            navigate(`/game/${roomInfo.roomId}?nickname=${roomInfo.nickname}`, {
+                state: { roomInfo }
+            });
         }
-    };
+    }, [roomInfo]);  // roomId가 변경될 때만 실행
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
@@ -30,7 +51,7 @@ export default function Home() {
                         type="text"
                         value={nickname}
                         onChange={(e) => setNickname(e.target.value)}
-                        style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', outline: 'none', boxShadow: '0 0 0 2px transparent', transition: 'box-shadow 0.2s' }}
+                        style={{ width: '96%', padding: '0.5rem 0.5rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', outline: 'none', boxShadow: '0 0 0 2px transparent', transition: 'box-shadow 0.2s' }}
                         placeholder="닉네임 입력"
                         onFocus={(e) => (e.target.style.boxShadow = '0 0 0 2px #8b5cf6')}
                         onBlur={(e) => (e.target.style.boxShadow = '0 0 0 0 transparent')}
@@ -44,7 +65,7 @@ export default function Home() {
                         onChange={(e) => setLanes(Number(e.target.value))}
                         min="2"
                         max="10"
-                        style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', outline: 'none', boxShadow: '0 0 0 2px transparent', transition: 'box-shadow 0.2s' }}
+                        style={{ width: '96%', padding: '0.5rem 0.5rem', border: '1px solid #d1d5db', borderRadius: '0.375rem', outline: 'none', boxShadow: '0 0 0 2px transparent', transition: 'box-shadow 0.2s' }}
                         onFocus={(e) => (e.target.style.boxShadow = '0 0 0 2px #8b5cf6')}
                         onBlur={(e) => (e.target.style.boxShadow = '0 0 0 0 transparent')}
                     />

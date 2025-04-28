@@ -1,0 +1,158 @@
+.ladder-board {
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ladder-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.lane-selector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lane-label {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+.lane-select {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #374151;
+  background-color: #fff;
+  font-size: 0.875rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* 레인 선택 버튼 스타일 */
+.lane-button {
+  width: 100%;
+  height: 100%;
+  padding: 4px 8px;
+  background-color: #8b5cf6; /* 보라색 기본 배경 */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem; /* 작은 폰트로 컴팩트 */
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #7c3aed; /* 호버 시 어두운 보라색 */
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.generate-button {
+  padding: 4px 16px;
+  background-color: #6b7280;
+  color: #fff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #1f2937;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.start-button {
+  padding: 4px 16px;
+  background-color: #8b5cf6;
+  color: #fff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #7c3aed;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.connect-button {
+  padding: 4px 16px;
+  color: #fff;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  margin-left: auto;
+
+  &.connect {
+    background-color: #3b82f6;
+
+    &:hover {
+      background-color: #2563eb;
+    }
+  }
+
+  &.disconnect {
+    background-color: #dc2626;
+
+    &:hover {
+      background-color: #b91c1c;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.current-player {
+  color: #4b5563;
+  font-size: 0.875rem;
+  transition: all 0.5s ease;
+
+  &.active {
+    color: #8b5cf6;
+    font-weight: 500;
+  }
+}
+
+.ladder-svg {
+  padding: 30px 0;
+  border: 1px solid #d1d5db;
+  margin-top: 16px;
+  border-radius: 6px;
+  background-color: #fff;
+  width: 100%;
+}
+
+.player-circle {
+  position: relative;
+  z-index: 10; // SVG 요소 중 가장 위로
+}
