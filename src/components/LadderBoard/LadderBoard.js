@@ -92,7 +92,7 @@ const generateRandomBridges = (lanes) => {
     return bridges;
 };
 
-export default function LadderBoard({ roomId, roomInfo }) {
+export default function LadderBoard({ roomId, roomInfo, nickname }) {
     const [lanes, setLanes] = useState(4); // 기본값
     const [currentPosition, setCurrentPosition] = useState(0);
     const [selectedLane, setSelectedLane] = useState(0);
@@ -100,40 +100,65 @@ export default function LadderBoard({ roomId, roomInfo }) {
     const [bridges, setBridges] = useState([]);
     const [pathPositions, setPathPositions] = useState([]);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isGenerated, setIsGenerated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+// 새로운 상태: 방 정보와 참여자
+    const [roomData, setRoomData] = useState(null);
+    const [participants, setParticipants] = useState([]);
 
-
-    // 이전 컴포넌트에서 방 정보 가져오기
+    // 방 정보와 참여자 정보 가져오기
     useEffect(() => {
-        console.log('>>roomInfo ', roomInfo)
         if (!roomId) {
             setError('Room ID is required');
             setIsLoading(false);
             return;
         }
 
-        setCurrentPlayer(roomInfo.nickname)
-
-        const fetchLanes = async () => {
+        const fetchData = async () => {
+            setIsLoading(true);
             try {
                 // TODO
-                // const res = await fetch(`http://localhost:3001/api/rooms/${roomId}`);
-                // if (!res.ok) throw new Error('Failed to fetch room data');
-                // const data = await roomInfo.json();
-                const data = await roomInfo;
-                // const data = {
-                //     "lanes": 4,
-                //     "romeId": "12345"
-                // }
-                const newLanes = Math.min(Math.max(Number(data.lanes) || 4, 2), 10);
+                // const [roomRes, participantsRes] = await Promise.all([
+                //     fetch(`http://localhost:9090/search/room?roomId=${roomId}`, {
+                //         credentials: 'include',
+                //     }),
+                //     fetch(`http://localhost:9090/room/participants?roomId=${roomId}`, {
+                //         credentials: 'include',
+                //     }),
+                // ]);
+                //
+                // // 방 정보 처리
+                // if (!roomRes.ok) throw new Error('Failed to fetch room data');
+                // const roomData = await roomRes.json();
+                const roomData = {
+                    "roomId": "test1",
+                    "roomName": "Test Room",
+                    "lanes": 6,
+                    "winRailNo": 0,
+                    "nickname": "Guest",
+                    "selectedLane": null,
+                    "participants": [
+                        { "nickname": "Player1", "selectedLane": 0 },
+                        { "nickname": "Player2", "selectedLane": 1 },
+                        { "nickname": "Player2", "selectedLane": 2 },
+                        { "nickname": "Player2", "selectedLane": 3 },
+                        { "nickname": "Player3", "selectedLane": null },
+                        { "nickname": "Guest", "selectedLane": null }   // 나를 포함
+                    ]
+                }
+                setRoomData(roomData);
+                const newLanes = Math.min(Math.max(Number(roomData.lanes) || 4, 2), 10);
                 setLanes(newLanes);
-                setSelectedLane(null); // 레인 초기화
-                setBridges([]); // 사다리 초기화
+                setCurrentPlayer(roomData.nickname || 'Guest');
+                setBridges([]);
                 setPathPositions([]);
-                setIsGenerated(false);
                 setIsPlaying(false);
+
+                // 참여자 정보 처리
+                setSelectedLane(roomData.participants.find(p => p.nickname === roomData.nickname)?.selectedLane)
+                const participantsData = roomData.participants.filter(p => p.nickname !== roomData.nickname); // 나를 제외한 참가자
+                setParticipants(participantsData.participants || []);
+
                 setIsLoading(false);
             } catch (err) {
                 setError(err.message);
@@ -141,10 +166,8 @@ export default function LadderBoard({ roomId, roomInfo }) {
             }
         };
 
-        fetchLanes();
+        fetchData();
     }, [roomId]);
-
-    // TODO 서버에서 참가자 정보 가져오기
     
     
 
@@ -157,16 +180,18 @@ export default function LadderBoard({ roomId, roomInfo }) {
         }
     }, [selectedLane, isPlaying]);
 
-
-    // 사다리 랜덤 생성 핸들러
-    const handleGenerateLadder = () => {
-        const newBridges = generateRandomBridges(lanes);
-        setBridges(newBridges);
-        setPathPositions([]);
-        setCurrentPosition(selectedLane);
-        setIsGenerated(true);
-        setIsPlaying(false);
-    };
+    //사다리 선택 핸들러
+    const handleSelectedLane = async (lane) => {
+        try {
+            // TODO
+            // await fetch(`http://localhost:9090/add/lane?roomId=${roomId}&nickname=${nickname}&selectedLane=${selectedLane}`)
+        } catch (err) {
+            setError(err.message);
+            setIsLoading(false);
+        } finally {
+            setSelectedLane(lane);
+        }
+    }
 
     // 사다리타기 시작 핸들러
     const handleStartLadder = async () => {
@@ -206,30 +231,8 @@ export default function LadderBoard({ roomId, roomInfo }) {
 
     return (
         <div className="ladder-board">
-            <h2 className="ladder-title">사다리타기 - 방 {roomInfo.roomName}</h2>
+            <h2 className="ladder-title">사다리타기 - 방 {roomData.roomName}</h2>
             <div className="controls">
-                <div className="lane-selector">
-                    <label className="lane-label">시작 레인:</label>
-                    <select
-                        value={selectedLane}
-                        onChange={(e) => setSelectedLane(Number(e.target.value))}
-                        className="lane-select"
-                        disabled={isPlaying}
-                    >
-                        {Array.from({ length: lanes }, (_, i) => (
-                            <option key={i} value={i}>
-                                레인 {i + 1}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <button
-                    onClick={handleGenerateLadder}
-                    className="generate-button"
-                    disabled={isPlaying}
-                >
-                    사다리 랜덤 생성
-                </button>
                 <button
                     onClick={handleStartLadder}
                     className="start-button"
@@ -261,10 +264,15 @@ export default function LadderBoard({ roomId, roomInfo }) {
                         >
                             <button
                                 className={`lane-button ${selectedLane !== i ? 'active' : ''}`}
-                                onClick={() => setSelectedLane(i)} // handleSelectedLane 대신 setSelectedLane 사용
-                                disabled={isPlaying}
+                                // onClick={() => setSelectedLane(i)}
+                                onClick={() => handleSelectedLane(i)}
+                                disabled={ roomData.participants.some((p) => p.selectedLane === i) || isPlaying }
                             >
-                                레인 {i + 1}
+                                {
+                                    roomData.participants.some((p) => p.selectedLane === i)
+                                        ? roomData.participants.find((p) => p.selectedLane === i).nickname
+                                        : `레인 ${i + 1}`
+                                }
                             </button>
                         </foreignObject>
                     ))
@@ -351,7 +359,7 @@ export default function LadderBoard({ roomId, roomInfo }) {
                                 fill="white"
                                 fontWeight="bold"
                             >
-                                {currentPlayer || 'P'}
+                                {currentPlayer || nickname}
                             </text>
                         </motion.g>
                     ) : (
@@ -373,11 +381,40 @@ export default function LadderBoard({ roomId, roomInfo }) {
                                 fill="white"
                                 fontWeight="bold"
                             >
-                                {currentPlayer || 'P'}
+                                {currentPlayer || nickname}
                             </text>
                         </g>
                     )
                 )}
+                {/* 다른 참가자 아이콘 표시 */}
+                { selectedLane !== null && roomData.participants
+                    .filter((p) => p.selectedLane !== null && p.nickname !== nickname)
+                    .map((p, idx) => {
+                        const color = `hsl(${(p.selectedLane * 60) % 360}, 70%, 60%)`; // 간단한 색상 로직
+                        return (
+                            <g key={`participant-${idx}`}>
+                                <circle
+                                    cx={p.selectedLane * laneWidth + laneWidth / 2}
+                                    cy={3}
+                                    r="25"
+                                    fill={color}
+                                    stroke="#FFFFFF"
+                                    strokeWidth="2"
+                                    className="participant-circle"
+                                />
+                                <text
+                                    x={p.selectedLane * laneWidth + laneWidth / 2}
+                                    y={3}
+                                    textAnchor="middle"
+                                    fontSize="11"
+                                    fill="white"
+                                    fontWeight="bold"
+                                >
+                                    {p.nickname}
+                                </text>
+                            </g>
+                        );
+                    })}
             </svg>
         </div>
     );

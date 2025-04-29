@@ -3,12 +3,12 @@ import LadderBoard from './LadderBoard';
 
 export default function GameRoom() {
     const location = useLocation();
-    // const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(location.search);
     const roomId = location.pathname.split('/').pop();
-    const nickname = location.pathname.split('/').pop();
+    const nickname = params.get("nickname");
     const { roomInfo } = location.state || {};  // BE에서 받아온 정보
 
     if (!roomId) return <div>Loading...</div>;
 
-    return <LadderBoard roomId={roomId} roomInfo={roomInfo} initialNickname={nickname} />;
+    return <LadderBoard roomId={roomId} roomInfo={roomInfo} nickname={nickname} />;
 }
