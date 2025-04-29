@@ -106,6 +106,8 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
     const [roomData, setRoomData] = useState(null);
     const [participants, setParticipants] = useState([]);
 
+
+
     // 방 정보와 참여자 정보 가져오기
     useEffect(() => {
         if (!roomId) {
@@ -117,49 +119,23 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                // TODO
-                // const [roomRes, participantsRes] = await Promise.all([
-                //     fetch(`http://localhost:9090/search/room?roomId=${roomId}`, {
-                //         credentials: 'include',
-                //     }),
-                //     fetch(`http://localhost:9090/room/participants?roomId=${roomId}`, {
-                //         credentials: 'include',
-                //     }),
-                // ]);
-                //
-                // // 방 정보 처리
-                // if (!roomRes.ok) throw new Error('Failed to fetch room data');
-                // const roomData = await roomRes.json();
-                const roomData = {
-                    "roomId": "test1",
-                    "roomName": "Test Room",
-                    "lanes": 6,
-                    "winRailNo": 0,
-                    "nickname": "Guest",
-                    "selectedLane": null,
-                    "participants": [
-                        { "nickname": "Player1", "selectedLane": 0 },
-                        { "nickname": "Player2", "selectedLane": 1 },
-                        { "nickname": "Player2", "selectedLane": 2 },
-                        { "nickname": "Player2", "selectedLane": 3 },
-                        { "nickname": "Player3", "selectedLane": null },
-                        { "nickname": "Guest", "selectedLane": null }   // 나를 포함
-                    ]
-                }
-                setRoomData(roomData);
-                const newLanes = Math.min(Math.max(Number(roomData.lanes) || 4, 2), 10);
-                setLanes(newLanes);
-                setCurrentPlayer(roomData.nickname || 'Guest');
-                setBridges([]);
-                setPathPositions([]);
-                setIsPlaying(false);
+                // 실제 API 요청
+                await fetch(`http://localhost:9090/search/rooms?roomId=${roomId}`, {
+                    method: "GET",
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        setRoomData(data); // 상태 업데이트
+                        console.log('>>>>room',roomData)
+                })
+                .catch((error) => {
+                    console.error("Error fetching rooms:", error);
+                });
 
-                // 참여자 정보 처리
-                setSelectedLane(roomData.participants.find(p => p.nickname === roomData.nickname)?.selectedLane)
-                const participantsData = roomData.participants.filter(p => p.nickname !== roomData.nickname); // 나를 제외한 참가자
-                setParticipants(participantsData.participants || []);
 
-                setIsLoading(false);
+
+
+
             } catch (err) {
                 setError(err.message);
                 setIsLoading(false);
@@ -168,8 +144,29 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
 
         fetchData();
     }, [roomId]);
-    
-    
+
+    useEffect(() => {
+        console.log('>>>>>222',roomData)
+        if(roomData){
+            console.log('>>>>>roomData.participants',roomData.participants)
+            const newLanes = Math.min(Math.max(Number(roomInfo?.lanes) || 4, 2), 10);
+            setLanes(newLanes);
+            setCurrentPlayer(nickname || '');
+            setBridges([]);
+            setPathPositions([]);
+            setIsPlaying(false);
+
+            // 참여자 정보 처리
+            if(roomData.participants){
+                setSelectedLane(roomData.participants.find(p => p.nickname === nickname)?.selectedLane)
+            }
+            const participantsData = roomData?.participants?.filter(p => p.nickname !== nickname); // 나를 제외한 참가자
+            setParticipants(participantsData?.participants || []);
+
+            setIsLoading(false);
+        }
+
+    }, [roomData])
 
     // 시작 레인 선택 시 플레이어 이동 및 경로 초기화
     useEffect(() => {
@@ -231,7 +228,7 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
 
     return (
         <div className="ladder-board">
-            <h2 className="ladder-title">사다리타기 - 방 {roomData.roomName}</h2>
+            <h2 className="ladder-title">사다리타기 - 방 {roomData?.roomName}</h2>
             <div className="controls">
                 <button
                     onClick={handleStartLadder}
@@ -266,11 +263,11 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
                                 className={`lane-button ${selectedLane !== i ? 'active' : ''}`}
                                 // onClick={() => setSelectedLane(i)}
                                 onClick={() => handleSelectedLane(i)}
-                                disabled={ roomData.participants.some((p) => p.selectedLane === i) || isPlaying }
+                                disabled={ roomData?.participants.some((p) => p.selectedLane === i) || isPlaying }
                             >
                                 {
-                                    roomData.participants.some((p) => p.selectedLane === i)
-                                        ? roomData.participants.find((p) => p.selectedLane === i).nickname
+                                    roomData?.participants.some((p) => p.selectedLane === i)
+                                        ? roomData?.participants.find((p) => p.selectedLane === i).nickname
                                         : `레인 ${i + 1}`
                                 }
                             </button>
@@ -387,7 +384,7 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
                     )
                 )}
                 {/* 다른 참가자 아이콘 표시 */}
-                { selectedLane !== null && roomData.participants
+                { selectedLane !== null && roomData?.participants
                     .filter((p) => p.selectedLane !== null && p.nickname !== nickname)
                     .map((p, idx) => {
                         const color = `hsl(${(p.selectedLane * 60) % 360}, 70%, 60%)`; // 간단한 색상 로직

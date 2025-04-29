@@ -16,7 +16,7 @@ const RoomList = () => {
     // const data = JSON.parse(event.data);
 
     // 실제 API 요청
-    /*fetch("http://localhost:9090/rooms", {
+   fetch("http://localhost:9090/rooms", {
       method: "GET",
     })
       .then((response) => response.json())
@@ -27,33 +27,7 @@ const RoomList = () => {
       .catch((error) => {
         console.error("Error fetching rooms:", error);
       });
-    */
-    const data = {
-      rooms: [
-        {
-          roomId: 20250429091837,
-          roomName: "test1",
-          attendeeCount: 2,
-          lanes: 6,
-          winRailNo: 0,
-        },
-        {
-          roomId: 12345,
-          roomName: "test2",
-          attendeeCount: 4,
-          lanes: 4,
-          winRailNo: 1,
-        },
-        {
-          roomId: 12346,
-          roomName: "test3",
-          attendeeCount: 1,
-          lanes: 4,
-          winRailNo: 3,
-        },
-      ],
-    };
-    setRooms(data.rooms);
+
     //};
     //
     // eventSource.onerror = (error) => {

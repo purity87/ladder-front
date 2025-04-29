@@ -22,11 +22,28 @@ const JoinRoomModal = ({ onClose, room }) => {
 
     const handleJoin = (e) => {
         // 서버에 참가 요청 (추후 구현)
+        try {
+            const roomId = roomInfo.roomId
+            fetch("http://localhost:9090/add/participants", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ roomId, nickname }),
+            }).then((response) => {
+                console.log(response);
+                if(response.status === 200){
+                    onClose();
+                    navigate(`/game/${room.roomId}?nickname=${nickname}`, {
+                        state: { roomInfo }
+                    });
+                }
+            });
+        } catch (error) {
+            console.error("방 참여 실패", error);
+        }
+
+
         console.log(`참석: 닉네임(${nickname}), 방ID(${room.roomId})`);
-        onClose();
-        navigate(`/game/${room.roomId}?nickname=${nickname}`, {
-            state: { roomInfo }
-        });
+
     };
 
     return (
