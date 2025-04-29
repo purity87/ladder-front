@@ -105,7 +105,7 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
 // 새로운 상태: 방 정보와 참여자
     const [roomData, setRoomData] = useState(null);
     const [participants, setParticipants] = useState([]);
-
+console.log('!!!! 1!!!! roomId ', roomId)
 
 
     // 방 정보와 참여자 정보 가져오기
@@ -125,9 +125,10 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
                 })
                     .then((response) => response.json())
                     .then((data) => {
+                        console.log('>>>>data',data)
                         setRoomData(data); // 상태 업데이트
-                        console.log('>>>>room',roomData)
-                })
+                        console.log('>>>>room data >',roomData)
+                    })
                 .catch((error) => {
                     console.error("Error fetching rooms:", error);
                 });
@@ -143,12 +144,12 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
         };
 
         fetchData();
-    }, [roomId]);
+    }, []);
 
     useEffect(() => {
         console.log('>>>>>222',roomData)
         if(roomData){
-            console.log('>>>>>roomData.participants',roomData.participants)
+            console.log('>>>>>roomData.participants',roomData.participants, roomData?.participants )
             const newLanes = Math.min(Math.max(Number(roomInfo?.lanes) || 4, 2), 10);
             setLanes(newLanes);
             setCurrentPlayer(nickname || '');
@@ -157,12 +158,14 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
             setIsPlaying(false);
 
             // 참여자 정보 처리
-            if(roomData.participants){
-                setSelectedLane(roomData.participants.find(p => p.nickname === nickname)?.selectedLane)
+            const participantsData = roomData.participants !== undefined  ? roomData.participants.filter(p => p.nickname !== nickname) : null; // 나를 제외한 참가자
+            if(roomData.participants !== undefined ){
+                setSelectedLane( roomData.participants.find(p => p.nickname === nickname).selectedLane )
+                setParticipants(participantsData.participants);
             }
-            const participantsData = roomData?.participants?.filter(p => p.nickname !== nickname); // 나를 제외한 참가자
-            setParticipants(participantsData?.participants || []);
 
+
+            console.log('>participants > ', participants)
             setIsLoading(false);
         }
 
@@ -263,10 +266,10 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
                                 className={`lane-button ${selectedLane !== i ? 'active' : ''}`}
                                 // onClick={() => setSelectedLane(i)}
                                 onClick={() => handleSelectedLane(i)}
-                                disabled={ roomData?.participants.some((p) => p.selectedLane === i) || isPlaying }
+                                disabled={  roomData.participants !== undefined && roomData?.participants.some((p) => p.selectedLane === i) || isPlaying }
                             >
                                 {
-                                    roomData?.participants.some((p) => p.selectedLane === i)
+                                    roomData.participants !== undefined && roomData.participants.some((p) => p.selectedLane === i)
                                         ? roomData?.participants.find((p) => p.selectedLane === i).nickname
                                         : `레인 ${i + 1}`
                                 }
@@ -384,7 +387,7 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
                     )
                 )}
                 {/* 다른 참가자 아이콘 표시 */}
-                { selectedLane !== null && roomData?.participants
+                { selectedLane !== null && roomData.participants?.length > 0 && roomData.participants
                     .filter((p) => p.selectedLane !== null && p.nickname !== nickname)
                     .map((p, idx) => {
                         const color = `hsl(${(p.selectedLane * 60) % 360}, 70%, 60%)`; // 간단한 색상 로직
