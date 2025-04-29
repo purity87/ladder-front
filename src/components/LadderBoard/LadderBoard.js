@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import '../styles/LadderBoard.scss';
+import '../../styles/LadderBoard.scss';
 
 // 사다리 경로 계산 함수
 const calculatePath = (startLane, bridges, lanes) => {
