@@ -6,7 +6,7 @@ export default function GameRoom() {
     // const params = new URLSearchParams(location.search);
     const roomId = location.pathname.split('/').pop();
     const nickname = location.pathname.split('/').pop();
-    const { roomInfo } = location.state || {};  // 부모 컴포넌트에서 넘겨준 상태
+    const { roomInfo } = location.state || {};  // BE에서 받아온 정보
 
     if (!roomId) return <div>Loading...</div>;
 

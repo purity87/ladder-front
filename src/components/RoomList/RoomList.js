@@ -72,7 +72,12 @@ const RoomList = () => {
             <div className="room-list">
                 {rooms?.length > 0 ? (
                     rooms.map((room) => (
-                        <div key={room?.roomId} className="room-item" onClick={() => handleRoomClick(room)}>
+                        <div key={room?.roomId}
+                             className={`room-item ${room.lanes === room.attendeeCount ? 'disabled' : ''}`}
+                             onClick={() => {
+                            if (room.lanes !== room.attendeeCount) handleRoomClick(room)
+                            }}
+                        >
                             {room?.roomName} (참가자: {room?.attendeeCount}명/{room?.lanes}명)
                         </div>
                     ))

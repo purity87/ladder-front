@@ -34,6 +34,11 @@
     background-color: #ede9fe;
   }
 }
+.room-item.disabled {
+  pointer-events: none; // 클릭 막기
+  opacity: 0.5;         // 흐릿하게
+  cursor: not-allowed;   // 마우스 모양 변경
+}
 
 .no-rooms {
   color: #aaa;

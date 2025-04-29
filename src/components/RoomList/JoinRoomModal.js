@@ -45,7 +45,12 @@ const JoinRoomModal = ({ onClose, room }) => {
                     <button className="close-button" onClick={onClose}>
                         닫기
                     </button>
-                    <button className="join-button" onClick={handleJoin}>
+                    <button className="join-button"
+                            onClick={handleJoin}
+                            style={{
+                                opacity: !nickname,
+                            }}
+                            disabled={ !nickname }>
                         참석하기
                     </button>
                 </div>
