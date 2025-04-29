@@ -9,9 +9,11 @@ const CreateRoomModal = ({ onClose }) => {
     const navigate = useNavigate();
 
     const [roomInfo, setRoomInfo] = useState({
-        winRailNo: null,
-        nickName: '',
         roomId: '',
+        roomName: '',
+        nickName: '',
+        lanes: 4,
+        winRailNo: null,
     });
 
 
@@ -26,14 +28,16 @@ const CreateRoomModal = ({ onClose }) => {
             const res = await fetch('http://localhost:9090/create/room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nickname, lanes }),
+                body: JSON.stringify({ roomName, nickname, lanes }),
             })
             const { roomId, winRailNo } = await res.json();
             // 상태 업데이트
             setRoomInfo({
                 roomId,     // roomId: roomId 형태로 작성
+                roomName,
                 nickname,   // nickname: nickname 형태로 작성
                 winRailNo,  // winRailNo: winRailNo 형태로 작성
+                lanes,
             });
 
         } catch (error) {

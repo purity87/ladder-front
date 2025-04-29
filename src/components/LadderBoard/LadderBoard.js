@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import '../../styles/LadderBoard.scss';
 
 // 사다리 경로 계산 함수
-const calculatePath = (startLane, bridges, lanes) => {
+const calculatePath = async (startLane, bridges, lanes) => {
+    console.log('calculatePath > ',startLane, bridges, lanes)
     let currentLane = startLane;
     const positions = [{ lane: currentLane, step: 0 }];
 
@@ -104,7 +105,7 @@ export default function LadderBoard({ roomId, roomInfo }) {
     const [error, setError] = useState(null);
 
 
-    // 서버에서 참여 인원수 가져오기
+    // 이전 컴포넌트에서 방 정보 가져오기
     useEffect(() => {
         console.log('>>roomInfo ', roomInfo)
         if (!roomId) {
@@ -143,13 +144,19 @@ export default function LadderBoard({ roomId, roomInfo }) {
         fetchLanes();
     }, [roomId]);
 
+    // TODO 서버에서 참가자 정보 가져오기
+    
+    
+
     // 시작 레인 선택 시 플레이어 이동 및 경로 초기화
     useEffect(() => {
         if (!isPlaying) {
             setCurrentPosition(selectedLane);
             setPathPositions([]);
+            setBridges([]);
         }
     }, [selectedLane, isPlaying]);
+
 
     // 사다리 랜덤 생성 핸들러
     const handleGenerateLadder = () => {
@@ -162,10 +169,18 @@ export default function LadderBoard({ roomId, roomInfo }) {
     };
 
     // 사다리타기 시작 핸들러
-    const handleStartLadder = () => {
-        if (!isGenerated) return;
+    const handleStartLadder = async () => {
+        console.log('selectedLane> ', selectedLane)
+        if (selectedLane === null) return;
+
+        // 사다리 랜덤 생성
+        const newBridges = generateRandomBridges(lanes);
+        setBridges(newBridges);
+        setPathPositions([]);
+
         setCurrentPosition(selectedLane);
-        const positions = calculatePath(selectedLane, bridges, lanes);
+
+        const positions = await calculatePath(selectedLane, newBridges, lanes);
         setPathPositions(positions);
         setIsPlaying(true);
     };
@@ -191,7 +206,7 @@ export default function LadderBoard({ roomId, roomInfo }) {
 
     return (
         <div className="ladder-board">
-            <h2 className="ladder-title">사다리타기 - 방 {roomId}</h2>
+            <h2 className="ladder-title">사다리타기 - 방 {roomInfo.roomName}</h2>
             <div className="controls">
                 <div className="lane-selector">
                     <label className="lane-label">시작 레인:</label>
@@ -218,7 +233,7 @@ export default function LadderBoard({ roomId, roomInfo }) {
                 <button
                     onClick={handleStartLadder}
                     className="start-button"
-                    disabled={!isGenerated || isPlaying}
+                    disabled={ selectedLane === null || isPlaying}
                 >
                     {isPlaying ? '진행 중...' : '사다리타기 시작'}
                 </button>
@@ -314,6 +329,7 @@ export default function LadderBoard({ roomId, roomInfo }) {
                                         if(roomInfo.winRailNo === selectedLane){
                                             alert('당첨!');
                                         }
+                                        setSelectedLane(null)
                                     }
                                 },
                             }}

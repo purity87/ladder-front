@@ -6,9 +6,11 @@ const JoinRoomModal = ({ onClose, room }) => {
     const navigate = useNavigate();
     const [nickname, setNickname] = useState('');
     const [roomInfo, setRoomInfo] = useState({
-        winRailNo: room.winRailNo | null,
-        nickName: '',
         roomId: room.roomId | '',
+        roomName: room.roomName | '',
+        nickName: '',
+        lanes: room.lanes || 4,
+        winRailNo: room.winRailNo | null
     });
 
     useEffect(() => {

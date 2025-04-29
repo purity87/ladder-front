@@ -20,7 +20,7 @@ const RoomList = () => {
                         roomId: 20250429091837,
                         roomName: 'test1',
                         attendeeCount: 2,
-                        lanes: 4,
+                        lanes: 6,
                         winRailNo: 0
                     },
                     {
@@ -52,12 +52,7 @@ const RoomList = () => {
         };
     }, []);
 
-    // const handleEnterRoom = (roomId) => {
-    //     navigate(`/game/${roomId}`);
-    // };
-
     const handleRoomClick = (room) => {
-        console.log('>>room : ', room);
         setSelectedRoom(room);
         setShowJoinModal(true);
     };
