@@ -5,7 +5,6 @@ import '../../styles/LadderBoard.scss';
 
 // 사다리 경로 계산 함수
 const calculatePath = async (startLane, bridges, lanes) => {
-    console.log('calculatePath > ',startLane, bridges, lanes)
     let currentLane = startLane;
     const positions = [{ lane: currentLane, step: 0 }];
 
@@ -102,11 +101,9 @@ export default function LadderBoard({ roomId, roomInfo, nickname }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-// 새로운 상태: 방 정보와 참여자
+    // 방 정보와 참여자
     const [roomData, setRoomData] = useState(null);
     const [participants, setParticipants] = useState([]);
-console.log('!!!! 1!!!! roomId ', roomId)
-
 
     // 방 정보와 참여자 정보 가져오기
     useEffect(() => {
@@ -125,9 +122,7 @@ console.log('!!!! 1!!!! roomId ', roomId)
                 })
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log('>>>>data',data)
                         setRoomData(data); // 상태 업데이트
-                        console.log('>>>>room data >',roomData)
                     })
                 .catch((error) => {
                     console.error("Error fetching rooms:", error);
@@ -147,9 +142,7 @@ console.log('!!!! 1!!!! roomId ', roomId)
     }, []);
 
     useEffect(() => {
-        console.log('>>>>>222',roomData)
         if(roomData){
-            console.log('>>>>>roomData.participants',roomData.participants, roomData?.participants )
             const newLanes = Math.min(Math.max(Number(roomInfo?.lanes) || 4, 2), 10);
             setLanes(newLanes);
             setCurrentPlayer(nickname || '');
@@ -164,8 +157,6 @@ console.log('!!!! 1!!!! roomId ', roomId)
                 setParticipants(participantsData.participants);
             }
 
-
-            console.log('>participants > ', participants)
             setIsLoading(false);
         }
 
@@ -195,7 +186,6 @@ console.log('!!!! 1!!!! roomId ', roomId)
 
     // 사다리타기 시작 핸들러
     const handleStartLadder = async () => {
-        console.log('selectedLane> ', selectedLane)
         if (selectedLane === null) return;
 
         // 사다리 랜덤 생성
